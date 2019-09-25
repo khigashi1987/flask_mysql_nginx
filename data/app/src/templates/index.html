@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+{% block content %}
+    <h3>Test</h3>
+    <p>
+        {% if message %}
+            {{ message }}
+        {% else %}
+            No messages.
+        {% endif %}
+    </p>
+{% endblock %}

@@ -1,0 +1,41 @@
+version: '3'
+services:
+
+  mysql:
+    container_name: db_container
+    build: ./docker/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_USER=flaskappuser
+      - MYSQL_PASSWORD=flaskappuser
+      - MYSQL_DATABASE=sample
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./data/mysql/initdb.d:/docker-entrypoint-initdb.d
+      - ./data/mysql:/etc/mysql/conf.d:ro
+
+  uwsgi:
+    container_name: app_container
+    build: 
+      context: .
+      dockerfile: ./docker/app/Dockerfile
+    tty: false
+    ports:
+      - "3031:3031"
+    volumes:
+      - ./data/app:/var/www/FlaskApp
+    depends_on:
+      - mysql
+
+  nginx:
+    container_name: server_container
+    build: 
+      context: .
+      dockerfile: ./docker/nginx/Dockerfile
+    volumes:
+      - ./data/app:/var/www/FlaskApp
+    ports:
+      - "8080:8080"
+    depends_on:
+      - uwsgi
